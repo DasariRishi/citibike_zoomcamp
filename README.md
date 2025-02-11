@@ -42,6 +42,7 @@ This project automates the extraction, transformation, and visualization of **Ci
 6. **Looker Studio dashboard** provides insights into trip trends, popular stations, and more.
 
 ## 🔄 Architecture
+![added2021dataimage1](images/Screenshot4.png)
 
 ## 🛠️ Technologies Used
 - **Kestra** – Data Orchestration
