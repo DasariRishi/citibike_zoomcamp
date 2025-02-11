@@ -42,7 +42,7 @@ This project automates the extraction, transformation, and visualization of **Ci
 6. **Looker Studio dashboard** provides insights into trip trends, popular stations, and more.
 
 ## 🔄 Architecture
-![added2021dataimage1](images/Screenshot4.png)
+![project_Architecture_diagram](images/345.jpg)
 
 ## 🛠️ Technologies Used
 - **Kestra** – Data Orchestration
@@ -93,12 +93,12 @@ dbt test
 
 ## 📊 Looker Dashboard
 The dashboard provides insights into:
-- **Trip Duration & Frequency**
-- **Popular Stations & Routes**
+- **Trip Frequency**
+- **Popular Stations**
 - **Monthly Trends**
 - **User Type Analysis (Members vs. Casual Users)**
 
-🔗 **[View the Looker Dashboard](#)**https://lookerstudio.google.com/reporting/2bbae005-985f-42d0-86b9-49bf53debeac
+🔗 **[View the Looker Dashboard](#)**(https://lookerstudio.google.com/reporting/2bbae005-985f-42d0-86b9-49bf53debeac)
 
 ---
 ### 📩 Feel free to contribute or raise issues!
