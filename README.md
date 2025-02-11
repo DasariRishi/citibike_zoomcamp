@@ -43,6 +43,7 @@ This project automates the extraction, transformation, and visualization of **Ci
 
 ## 🔄 Architecture
 ![project_Architecture_diagram](images/345.jpg)
+![project_Architecture_diagram](images/Screenshot-2024.jpg)
 
 ## 🛠️ Technologies Used
 - **Kestra** – Data Orchestration
