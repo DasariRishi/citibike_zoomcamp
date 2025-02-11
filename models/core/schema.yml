@@ -1,0 +1,53 @@
+version: 2
+
+sources:
+  - name: core
+    database: "{{ env_var('DBT_DATABASE', 'kestra-citibike') }}"
+    schema: "{{ env_var('DBT_SCHEMA', 'zoomcamp') }}"
+      # loaded_at_field: record_loaded_at
+    tables:
+      - name: citibike_tripdata
+         # freshness:
+           # error_after: {count: 6, period: hour}
+
+models:
+    - name: stg_citibike_tripdata
+      description: >
+        Trip made by green taxis, also known as boro taxis and street-hail liveries.
+        Green taxis may respond to street hails,but only in the areas indicated in green on the
+        map (i.e. above W 110 St/E 96th St in Manhattan and in the boroughs).
+        The records were collected and provided to the NYC Taxi and Limousine Commission (TLC) by
+        technology service providers. 
+      columns:
+          - name: ride_id
+            description: Primary key for this table, generated with a concatenation of vendorid+pickup_datetime
+            tests:
+                - unique:
+                    severity: warn
+                - not_null:
+                    severity: warn
+          - name: rideable_type
+            description: hello
+          - name: started_at
+            description: The date and time when the meter was engaged.
+          - name: ended_at_time 
+            description: The date and time when the meter was disengaged.
+          - name: start_station_name
+            description: The number of passengers in the vehicle. This is a driver-entered value.
+          - name: start_station_id
+            description: The elapsed trip distance in miles reported by the taximeter.
+          - name: end_station_name
+            description: locationid where the meter was engaged.
+          - name: end_station_id 
+            description: locationid where the meter was engaged.
+          - name: start_lat 
+            description: Longitude where the meter was disengaged.
+          - name: start_lng 
+            description: Latitude where the meter was disengaged.
+          - name: end_lat 
+            description: Longitude where the meter was disengaged.
+          - name: end_lng 
+            description: Latitude where the meter was disengaged.
+          - name: member_casual
+            description: Description of the payment_type code
+          
