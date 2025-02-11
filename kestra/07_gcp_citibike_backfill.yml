@@ -1,0 +1,115 @@
+id: 07_gcp_citibike_backfill
+namespace: zoomcamp
+
+description: |
+  This workflow fetches, extracts, and loads CitiBike trip data into PostgreSQL.
+
+variables:
+  file: "JC-{{trigger.date | date('yyyyMM')}}-citibike-tripdata.csv.zip"
+  csv_file: "JC-{{trigger.date | date('yyyyMM')}}-citibike-tripdata.csv"
+  gcs_file: "gs://{{kv('GCP_BUCKET_NAME')}}/{{vars.csv_file}}"
+  table: "{{kv('GCP_DATASET')}}.JC-{{trigger.date | date('yyyyMM')}}-citibike-tripdata"
+  data: "{{outputs.extract.outputFiles['JC-' ~ (trigger.date | date('yyyyMM')) ~ '-citibike-tripdata.csv']}}"
+
+tasks:
+  - id: set_label
+    type: io.kestra.plugin.core.execution.Labels
+    labels:
+      file: "{{render(vars.file)}}"
+
+  - id: extract
+    type: io.kestra.plugin.scripts.shell.Commands
+    outputFiles:
+      - "*.csv"
+    taskRunner:
+      type: io.kestra.plugin.core.runner.Process
+    commands:
+      - wget -qO {{render(vars.file)}} https://s3.amazonaws.com/tripdata/{{render(vars.file)}}
+      - unzip -o {{render(vars.file)}} '*.csv'
+  
+  - id: upload_to_gcs
+    type: io.kestra.plugin.gcp.gcs.Upload
+    from: "{{render(vars.data)}}"
+    to: "{{render(vars.gcs_file)}}"
+
+  - id: bq_citibike_tripdata
+    type: io.kestra.plugin.gcp.bigquery.Query
+    sql: |
+        CREATE TABLE IF NOT EXISTS `{{kv('GCP_PROJECT_ID')}}.{{kv('GCP_DATASET')}}.citibike_tripdata`
+        ( ride_id STRING OPTIONS (description = 'Unique trip identifier'),
+          rideable_type STRING OPTIONS (description = 'type of bike'),
+          started_at TIMESTAMP OPTIONS (description = 'Trip start timestamp'),
+          ended_at TIMESTAMP OPTIONS (description = 'Trip end timestamp'),
+          start_station_name STRING OPTIONS (description = 'ID of the start station'),
+          start_station_id STRING OPTIONS (description = 'Name of the start station'),
+          end_station_name STRING OPTIONS (description = 'Name of the end station'),
+          end_station_id STRING OPTIONS (description = 'ID of the end station'),
+          start_lat FLOAT64 OPTIONS (description = 'Latitude of start station'),
+          start_lng FLOAT64 OPTIONS (description = 'Longitude of start station'),
+          end_lat FLOAT64 OPTIONS (description = 'Latitude of end station'),
+          end_lng FLOAT64 OPTIONS (description = 'Longitude of end station'),
+          member_casual STRING OPTIONS (description = 'User type: Subscriber or Customer')
+        );
+  
+  - id: bq_citibike_table_ext
+    type: io.kestra.plugin.gcp.bigquery.Query
+    sql: |
+        CREATE OR REPLACE EXTERNAL TABLE `{{kv('GCP_PROJECT_ID')}}.{{render(vars.table)}}_ext`
+        ( ride_id STRING OPTIONS (description = 'Unique trip identifier'),
+          rideable_type STRING OPTIONS (description = 'type of bike'),
+          started_at TIMESTAMP OPTIONS (description = 'Trip start timestamp'),
+          ended_at TIMESTAMP OPTIONS (description = 'Trip end timestamp'),
+          start_station_name STRING OPTIONS (description = 'ID of the start station'),
+          start_station_id STRING OPTIONS (description = 'Name of the start station'),
+          end_station_name STRING OPTIONS (description = 'Name of the end station'),
+          end_station_id STRING OPTIONS (description = 'ID of the end station'),
+          start_lat FLOAT64 OPTIONS (description = 'Latitude of start station'),
+          start_lng FLOAT64 OPTIONS (description = 'Longitude of start station'),
+          end_lat FLOAT64 OPTIONS (description = 'Latitude of end station'),
+          end_lng FLOAT64 OPTIONS (description = 'Longitude of end station'),
+          member_casual STRING OPTIONS (description = 'User type: Subscriber or Customer')
+        )
+        OPTIONS (
+              format = 'CSV',
+              uris = ['{{render(vars.gcs_file)}}'],
+              skip_leading_rows = 1,
+              ignore_unknown_values = TRUE
+          );
+
+  - id: bq_citi_table_tmp
+    type: io.kestra.plugin.gcp.bigquery.Query
+    sql: |
+      CREATE OR REPLACE TABLE `{{kv('GCP_PROJECT_ID')}}.{{render(vars.table)}}`
+      AS
+      SELECT *
+      FROM `{{kv('GCP_PROJECT_ID')}}.{{render(vars.table)}}_ext`;
+
+  - id: bq_citibike_merge
+    type: io.kestra.plugin.gcp.bigquery.Query
+    sql: |
+      MERGE INTO `{{kv('GCP_PROJECT_ID')}}.{{kv('GCP_DATASET')}}.citibike_tripdata` T
+      USING `{{kv('GCP_PROJECT_ID')}}.{{render(vars.table)}}` S
+      ON T.ride_id = S.ride_id
+      WHEN NOT MATCHED THEN
+         INSERT (ride_id,rideable_type,started_at, ended_at, start_station_name, start_station_id, end_station_name,end_station_id,start_lat, start_lng, end_lat, end_lng, member_casual)
+         VALUES(S.ride_id, S.rideable_type, S.started_at, S.ended_at, S.start_station_name, S.start_station_id, S.end_station_name, S.end_station_id, S.start_lat, S.start_lng, S.end_lat, S.end_lng, S.member_casual);
+
+
+  - id: purge_files
+    type: io.kestra.plugin.core.storage.PurgeCurrentExecutionFiles
+    description: To avoid cluttering your storage, we will remove the downloaded files.
+
+pluginDefaults:
+  - type: io.kestra.plugin.gcp
+    values:
+      serviceAccount: "{{kv('GCP_CREDS')}}"
+      projectId: "{{kv('GCP_PROJECT_ID')}}"
+      location: "{{kv('GCP_LOCATION')}}"
+      bucket: "{{kv('GCP_BUCKET_NAME')}}"
+
+triggers:
+  - id: backfill_schedule
+    type: io.kestra.plugin.core.trigger.Schedule
+    cron: "0 9 1 * *"
+
+
