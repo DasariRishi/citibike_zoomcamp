@@ -98,7 +98,7 @@ The dashboard provides insights into:
 - **Monthly Trends**
 - **User Type Analysis (Members vs. Casual Users)**
 
-🔗 **[View the Looker Dashboard](#)**(https://lookerstudio.google.com/reporting/2bbae005-985f-42d0-86b9-49bf53debeac)
+🔗 **[View the Looker Dashboard](https://lookerstudio.google.com/reporting/2bbae005-985f-42d0-86b9-49bf53debeac)**
 
 ---
 ### 📩 Feel free to contribute or raise issues!
