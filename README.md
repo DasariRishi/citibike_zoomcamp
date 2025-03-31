@@ -91,7 +91,7 @@ dbt run
 # Validate the transformations
 dbt test
 ```
-## 🛠️ How to Develop This Project Locally
+## 🛠️ How to Develop This Project
 
 Follow these steps to set up and run the full data pipeline on your local machine:
 
