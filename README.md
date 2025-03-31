@@ -3,6 +3,8 @@
 
 ## 📌 Overview
 This project automates the extraction, transformation, and visualization of **Citi Bike** trip data. The pipeline utilizes **Kestra** for data orchestration, **Google Cloud Storage & BigQuery** for storage and processing, **dbt** for transformations, and **Looker Studio** for dashboard visualization.
+## 🚲 Problem Statement:
+How do seasonal trends and bike type preferences influence overall ridership patterns in the Citi Bike program? Additionally, what insights can be drawn about user behavior and system utilization by analyzing the distribution of trip volumes across months and bike types?
 
 ## 🚀 Features
 - **Automated Data Ingestion:** Kestra fetches data monthly from [CitiBike Trip Data](https://s3.amazonaws.com/tripdata/index.html).
