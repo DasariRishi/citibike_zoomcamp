@@ -124,7 +124,7 @@ Open your browser and go to [http://localhost:8080](http://localhost:8080) to ac
    - Create a **staging table** in BigQuery.
 
 > 🔑 **Important:** You must have a [Google Cloud project](https://console.cloud.google.com/), a GCS bucket, and BigQuery dataset set up. Update the credentials or key-value fields in your flow YAML to match your setup.
-
+![project_kestra_flow_diagram](images/kestra_flow.jpg)
 ### 4. Run dbt Transformations
 
 Set up your `profiles.yml` file with your BigQuery credentials, then run:
