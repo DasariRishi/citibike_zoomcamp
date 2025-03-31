@@ -146,6 +146,17 @@ This will transform the staging table into a clean, production-ready `citibike_t
    - Monthly trends
    - Most popular start/end stations
    - User type breakdowns
+## Questions Answered and Findings
+The data covers the years **2023** and **2024**. Below are some of the key insights and analytics derived from the dataset:
+![project_pie_diagram](images/Screenshot-2024.png)
+- The top-left corner of the dashboard allows users to choose the date range.
+- **Total rides**: 2,041,278
+- **Bike Types**: 63.00% are Classic bikes, making them the most used type.
+![project_yearly_diagram](images/Screenshot-2024.png)
+- The impact of weather on biking habits is evident:
+  - Most popular months for rides are **June, July**, and **August**.
+  - Least popular months are **December, February**, and **January**, reflecting lower ridership in colder months.
+  - **2024** shows higher ride counts than **2023** for every month, especially from March through November, indicating a clear growth trend.
 ## 📊 Looker Dashboard
 The dashboard provides insights into:
 - **Trip Frequency**
